@@ -3,480 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DaVinci Resolve: Interactive Color Panel Guide</title>
-    <!-- Load Tailwind CSS -->
+    <meta name="description" content="Student reference guide to selected DaVinci Resolve Color page tools, including Primaries, HDR Wheels, Curves, ColorSlice, RGB Mixer, Color Match, Camera Raw and Motion Effects.">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
+    <link rel="canonical" href="https://joenasriani.github.io/davinci-color/">
+    <title>DaVinci Resolve Color Page — Student Reference Guide</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Inter font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles for the page */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Style for the tab buttons */
-        .tab-button {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        /* Style for the active tab button */
-        .tab-button.active {
-            border-color: #3b82f6; /* blue-500 */
-            background-color: #3b82f6;
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        /* Hide inactive tab content */
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-
-        /* Show active tab content */
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        .tab-button { transition: border-color .2s ease, background-color .2s ease, color .2s ease; cursor: pointer; }
+        .tab-button[aria-selected="true"] { border-color: #3b82f6; background-color: #3b82f6; color: #fff; font-weight: 600; }
+        .tab-panel[hidden] { display: none; }
+        code { background: #1f2937; padding: .1rem .3rem; border-radius: .25rem; }
+        .note { border-left: 3px solid #6b7280; padding-left: 1rem; }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 antialiased">
-
-    <!-- Main Container -->
     <div class="container mx-auto max-w-7xl p-4 md:p-8">
-
-        <!-- Header -->
         <header class="mb-8">
-            <h1 class="text-4xl font-bold text-white mb-2">DaVinci Resolve: Interactive Color Panel Guide</h1>
-            <p class="text-xl text-gray-400">Click on the tabs below to explore each color tool from your screenshots.</p>
+            <h1 class="text-4xl font-bold text-white mb-3">DaVinci Resolve Color Page — Student Reference Guide</h1>
+            <p class="text-lg text-gray-300 max-w-4xl">Use the tabs to review selected Color page tools, what they change, when they are useful, and the limits of each method.</p>
+            <p class="mt-4 text-sm text-gray-400 max-w-4xl note">Content audited against Blackmagic Design's DaVinci Resolve 20 training material on 17 September 2026. Screenshots were captured in 2025. Interface labels, feature availability, RAW controls and color-management behavior can vary by Resolve version, platform, media format and Free/Studio edition.</p>
         </header>
 
-        <!-- Tab Navigation -->
-        <nav class="flex flex-wrap -mx-1 mb-8" id="tab-nav">
-            <!-- These data-tab attributes link to the content IDs -->
-            <button class="tab-button active m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" data-tab="tab-primaries">Primaries</button>
-            <button class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" data-tab="tab-hdr">HDR Wheels</button>
-            <button class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" data-tab="tab-curves">Custom Curves</button>
-            <button class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" data-tab="tab-colorslice">ColorSlice</button>
-            <button class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" data-tab="tab-rgbmixer">RGB Mixer</button>
-            <button class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" data-tab="tab-colormatch">Color Match</button>
-            <button class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" data-tab="tab-cameraraw">Camera Raw</button>
-            <button class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" data-tab="tab-motion">Motion Effects</button>
+        <nav class="flex flex-wrap -mx-1 mb-8" id="tab-nav" role="tablist" aria-label="DaVinci Resolve Color tools">
+            <button id="tab-primaries-button" class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" role="tab" aria-selected="true" aria-controls="tab-primaries" tabindex="0">Primaries</button>
+            <button id="tab-hdr-button" class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" role="tab" aria-selected="false" aria-controls="tab-hdr" tabindex="-1">HDR Wheels</button>
+            <button id="tab-curves-button" class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" role="tab" aria-selected="false" aria-controls="tab-curves" tabindex="-1">Custom Curves</button>
+            <button id="tab-colorslice-button" class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" role="tab" aria-selected="false" aria-controls="tab-colorslice" tabindex="-1">ColorSlice</button>
+            <button id="tab-rgbmixer-button" class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" role="tab" aria-selected="false" aria-controls="tab-rgbmixer" tabindex="-1">RGB Mixer</button>
+            <button id="tab-colormatch-button" class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" role="tab" aria-selected="false" aria-controls="tab-colormatch" tabindex="-1">Color Match</button>
+            <button id="tab-cameraraw-button" class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" role="tab" aria-selected="false" aria-controls="tab-cameraraw" tabindex="-1">Camera Raw</button>
+            <button id="tab-motion-button" class="tab-button m-1 py-2 px-4 rounded-lg border-2 border-gray-700 bg-gray-800 text-gray-300" role="tab" aria-selected="false" aria-controls="tab-motion" tabindex="-1">Motion Effects</button>
         </nav>
 
-        <!-- Tab Content Area -->
         <main id="tab-content-area">
-
-            <!-- 1. Primaries - Color Wheels -->
-            <section id="tab-primaries" class="tab-content active">
-                <h2 class="text-3xl font-semibold text-white mb-6">1. Primaries - Color Wheels</h2>
-                <img src="Screenshot 2025-11-02 at 10.10.32.png" alt="Screenshot 2025-11-02 at 10.10.32.png" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
-                
+            <section id="tab-primaries" class="tab-panel" role="tabpanel" aria-labelledby="tab-primaries-button">
+                <h2 class="text-3xl font-semibold text-white mb-6">1. Primaries — Color Wheels</h2>
+                <img src="photos/Screenshot 2025-11-02 at 10.10.32.png" alt="DaVinci Resolve Primaries Color Wheels panel" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What Is It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">This is the **Primaries Color Wheels** panel, your main and most fundamental tool. It's used for "primary" color correction, which means making broad adjustments to the entire image to balance it and set the overall look.</p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What it does</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">The Primary Wheels make broad color and tonal adjustments using overlapping ranges: Lift for darker tones, Gamma for midtones, Gain for brighter tones, and Offset for the image as a whole.</p>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When & Why Do We Use It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">You use this panel **first** on almost every shot.
-                        <br><br>
-                        **Why?** To correct problems and set a "look".
-                        <br>
-                        1. **Correction:** Fix exposure (too dark/bright) and white balance (too blue/orange).
-                        <br>
-                        2. **Grading:** Create a mood (e.g., a cold, blue look for a winter scene or a warm, saturated look for a sunset).</p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When it is useful</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">Use Primaries for image balancing and broad corrections such as exposure, color balance, contrast and saturation. They are commonly used early in a grade, but there is no single mandatory node order for every project.</p>
                     </div>
                 </div>
-
                 <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">What Do the Tools Do?</h3>
-                    <ul class="list-disc list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Lift (Shadows):</strong> Controls the dark areas. Drag the center puck to tint the shadows (e.g., add blue). Drag the wheel underneath to make shadows brighter or darker.</li>
-                        <li><strong>Gamma (Midtones):</strong> Controls the middle-gray areas. This is where skin tones and most details live. It has the biggest impact on the image's perceived brightness.</li>
-                        <li><strong>Gain (Highlights):</strong> Controls the bright areas. This adjusts the "whites" of your image.</li>
-                        <li><strong>Offset:** Adjusts the *entire image at once* (shadows, midtones, and highlights). Great for a quick, large exposure fix before fine-tuning.</li>
-                        <li><strong>Temp & Tint:** Your main white balance controls. **Temp** makes the image warmer (orange) or cooler (blue). **Tint** corrects any green or magenta shift.</li>
-                        <li><strong>Contrast & Pivot:** **Contrast** increases/decreases the difference between light and dark. **Pivot** sets the center point for the contrast adjustment.</li>
-                        <li><strong>Saturation:** Increases or decreases the color intensity for the whole image.</li>
-                        <li><strong>Color Boost:** A "smart" saturation that mainly boosts less-saturated colors, protecting skin tones from looking unnatural.</li>
+                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">Key controls</h3>
+                    <ul class="list-disc text-lg text-gray-300 space-y-3 pl-6">
+                        <li><strong>Lift:</strong> changes darker tonal regions, with overlap into adjacent tones.</li>
+                        <li><strong>Gamma:</strong> changes midtone regions, with overlap into darker and brighter tones.</li>
+                        <li><strong>Gain:</strong> changes brighter tonal regions, with overlap into adjacent tones.</li>
+                        <li><strong>Offset:</strong> changes the image globally rather than targeting one tonal range.</li>
+                        <li><strong>Temperature and Tint:</strong> shift the overall color balance along warm/cool and green/magenta axes.</li>
+                        <li><strong>Contrast and Pivot:</strong> alter tonal separation and the tonal center around which contrast is applied.</li>
+                        <li><strong>Saturation:</strong> changes overall color intensity.</li>
+                        <li><strong>Color Boost:</strong> increases saturation more strongly in areas that begin with lower saturation.</li>
                     </ul>
                 </div>
-
-                <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">How Do We Use It? (A Basic Workflow)</h3>
-                    <ol class="list-decimal list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Step 1: Balance:** On your first node, use `Temp` and `Tint` to get a correct white balance (e.g., make a white wall look white).</li>
-                        <li><strong>Step 2: Set Exposure:** Use `Lift` to set your "black point" (make the darkest part just above pure black). Use `Gain` to set your "white point" (make the brightest part just below pure white).</li>
-                        <li><strong>Step 3: Adjust Midtones:** Use `Gamma` to set the main brightness of the shot. This is your primary skin tone adjustment.</li>
-                        <li><strong>Step 4: Set Saturation:** Use the `Saturation` slider to add or remove the desired amount of color. A value of 50 is default.</li>
-                    </ol>
+                <div class="mt-8 note text-gray-300">
+                    <strong>Practice:</strong> balance a shot while watching the image and scopes. Do not treat fixed black-point, white-point or skin-tone values as universal rules; target levels depend on the source, color-management pipeline and deliverable.
                 </div>
             </section>
 
-            <!-- 2. HDR - High Dynamic Range Wheels -->
-            <section id="tab-hdr" class="tab-content">
-                <h2 class="text-3xl font-semibold text-white mb-6">2. HDR - High Dynamic Range Wheels</h2>
-                <img src="Screenshot 2025-11-02 at 10.11.50.png" alt="Screenshot 2025-11-02 at 10.11.50.png" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
-                
+            <section id="tab-hdr" class="tab-panel" role="tabpanel" aria-labelledby="tab-hdr-button" hidden>
+                <h2 class="text-3xl font-semibold text-white mb-6">2. HDR Wheels</h2>
+                <img src="photos/Screenshot 2025-11-02 at 10.11.50.png" alt="DaVinci Resolve HDR Wheels panel" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What Is It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">This is the **High Dynamic Range (HDR) Wheels** panel. Think of it as a super-precise version of the Primaries wheels. It breaks the image into many specific "zones" (Dark, Shadow, Light, etc.) and lets you adjust them individually.</p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What it does</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">The HDR palette provides color and exposure controls mapped to customizable tonal zones. Those zones can be moved or resized to suit the tonal structure of the shot.</p>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When & Why Do We Use It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">You use this when the Primaries wheels are too "blunt" and affect parts of the image you don't want to change.
-                        <br><br>
-                        **Why?** For precision control.
-                        <br>
-                        **Example:** You want to make the bright sky darker, but when you use the `Gain` wheel, it also darkens the actor's face. With HDR Wheels, you can adjust the `Light` zone (the sky) without touching the `Shadow` zone (where the face might be).</p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When it is useful</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">Use it when you want more direct control over a selected tonal region than broad Primary adjustments provide, especially across wide dynamic ranges.</p>
                     </div>
                 </div>
-
                 <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">What Do the Tools Do?</h3>
-                    <ul class="list-disc list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Zone Wheels (Dark, Shadow, Light, Global):</strong> Each wheel controls a specific brightness range. By default, you see four, but you can enable more.</li>
-                        <li><strong>Zone Graph (Top):</strong> The small graph at the top shows you the *range* of each zone. You can drag these to change what "Shadow" vs. "Light" means, giving you total control.</li>
-                        <li><strong>Exp (Exposure):</strong> The master wheel under each zone. This controls the brightness of *only* that zone.</li>
-                        <li><strong>Sat (Saturation):</strong> The slider under each zone. This controls the saturation of *only* that zone.</li>
-                        <li><strong>Global:** A wheel that acts like the `Offset` wheel, affecting the entire image.</li>
+                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">Key controls and limits</h3>
+                    <ul class="list-disc text-lg text-gray-300 space-y-3 pl-6">
+                        <li><strong>Zone wheels:</strong> target defined tonal regions such as dark, shadow, light or additional custom zones.</li>
+                        <li><strong>Zone-range controls:</strong> change where each tonal zone operates and how it transitions into neighboring ranges.</li>
+                        <li><strong>Exposure and color controls:</strong> modify the selected range rather than mathematically isolating it from all other tones.</li>
+                        <li><strong>Global:</strong> applies a broader image-wide adjustment.</li>
                     </ul>
                 </div>
-
-                <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">How Do We Use It? (Example)</h3>
-                    <ol class="list-decimal list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Goal:** Darken a bright sky without affecting the actor.</li>
-                        <li><strong>Step 1:** Select the `Light` wheel (this zone usually contains the sky).</li>
-                        <li><strong>Step 2:** Drag the `Exp` (Exposure) master wheel underneath it downwards. You will see the sky get darker, while the rest of the image is mostly untouched.</li>
-                        <li><strong>Step 3:** If the effect is too strong or not strong enough on the sky, drag the zone controls in the graph at the top to fine-tune exactly what brightness range the `Light` wheel is affecting.</li>
-                    </ol>
-                </div>
+                <div class="mt-8 note text-gray-300"><strong>Practice:</strong> target a bright sky with a lighter HDR zone, then watch the rest of the image while adjusting it. HDR zones have transitions and overlap; do not assume an adjacent face or object will remain completely unchanged.</div>
             </section>
-            
-            <!-- 3. Custom Curves -->
-            <section id="tab-curves" class="tab-content">
-                <h2 class="text-3xl font-semibold text-white mb-6">3. Curves - Custom</h2>
-                <img src="Screenshot 2025-11-02 at 10.12.37.png" alt="Screenshot 2025-11-02 at 10.12.37.png" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
-                
+
+            <section id="tab-curves" class="tab-panel" role="tabpanel" aria-labelledby="tab-curves-button" hidden>
+                <h2 class="text-3xl font-semibold text-white mb-6">3. Custom Curves</h2>
+                <img src="photos/Screenshot 2025-11-02 at 10.12.37.png" alt="DaVinci Resolve Custom Curves panel" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What Is It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">This is the **Custom Curves** panel. It's a classic, powerful tool that gives you visual control over the image's contrast and color. The graph represents your image's tonal range, from pure black (bottom-left) to pure white (top-right).</p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What it does</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">Custom Curves map input tonal or channel values to new output values. Control points let you reshape that relationship instead of applying one global contrast or color adjustment.</p>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When & Why Do We Use It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">You use this for fine-tuning contrast and creating stylized color tints.
-                        <br><br>
-                        **Why?** It offers more granular control than the simple `Contrast` slider.
-                        <br>
-                        1. **For Contrast:** Creating a gentle "S-Curve" is the most common way to add cinematic contrast.
-                        <br>
-                        2. **For Color:** You can manipulate the individual Red, Green, and Blue curves to add color tints to specific tonal ranges (e.g., add blue to shadows, yellow to highlights).
-                        </p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When it is useful</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">Use curves for localized tonal shaping or for controlled changes to individual RGB channels. An S-shaped curve is one possible contrast treatment, not a required grading style.</p>
                     </div>
                 </div>
-
                 <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">What Do the Tools Do?</h3>
-                    <ul class="list-disc list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>The Graph/Line:** The diagonal line is your image. Clicking to add a point and dragging it **up** makes that part of the image brighter. Dragging **down** makes it darker.</li>
-                        <li><strong>Y, R, G, B Buttons:** By default, you are on `Y` (Luminance), which controls all three channels together for brightness/contrast. You can click `R`, `G`, or `B` to control *only* that color channel.</li>
-                        <li><strong>Soft Clip:** A tool to "roll off" or compress the highlights/shadows to prevent them from clipping (losing detail) and to create a softer, more filmic look.</li>
+                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">Reading the graph</h3>
+                    <ul class="list-disc text-lg text-gray-300 space-y-3 pl-6">
+                        <li>The horizontal axis represents input values; the vertical axis represents output values.</li>
+                        <li>Moving a point upward raises that mapped output value; moving it downward lowers it.</li>
+                        <li>Channel selectors let you work on combined tonal response or individual RGB channels, depending on the selected curve mode.</li>
                     </ul>
                 </div>
-
-                <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">How Do We Use It? (Creating an S-Curve)</h3>
-                    <ol class="list-decimal list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Step 1:** Ensure the `Y` button is selected.</li>
-                        <li><strong>Step 2:** Click on the line in the top-right quadrant (highlights) and drag it gently **up** to brighten the highlights.</li>
-                        <li><strong>Step 3:** Click on the line in the bottom-left quadrant (shadows) and drag it gently **down** to darken the shadows.</li>
-                        <li><strong>Result:** You have created an "S" shape, which adds contrast to your image in a smooth, pleasing way.</li>
-                    </ol>
-                </div>
+                <div class="mt-8 note text-gray-300"><strong>Practice:</strong> make a small curve adjustment and compare it with the ungraded image and scopes. Avoid assuming that more contrast is automatically a better result.</div>
             </section>
-            
-            <!-- 4. ColorSlice -->
-            <section id="tab-colorslice" class="tab-content">
+
+            <section id="tab-colorslice" class="tab-panel" role="tabpanel" aria-labelledby="tab-colorslice-button" hidden>
                 <h2 class="text-3xl font-semibold text-white mb-6">4. ColorSlice</h2>
-                <img src="Screenshot 2025-11-02 at 10.13.40.png" alt="Screenshot 2025-11-02 at 10.13.40.png" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
-                
+                <img src="photos/Screenshot 2025-11-02 at 10.13.40.png" alt="DaVinci Resolve ColorSlice panel" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What Is It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">This is the **ColorSlice** panel, a modern "vector" tool. It's a **secondary grading** tool, meaning it's used to adjust *specific colors* after your primary balance is done. It breaks the image into six "slices" (Red, Skin, Yellow, Green, Cyan, Blue, Magenta) and lets you adjust them independently.</p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What it does</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">ColorSlice provides predefined, adjustable color vectors such as Red, Skin, Yellow, Green, Cyan, Blue and Magenta. The ranges are blended rather than being hard masks.</p>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When & Why Do We Use It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">You use this for targeted "secondary" adjustments.
-                        <br><br>
-                        **Why?** It's incredibly fast and intuitive for common tasks.
-                        <br>
-                        **Examples:**
-                        <br>
-                        - "The actor's `Skin` tone is too red, I want it more orange."
-                        <br>
-                        - "I want the `Blue` sky to be darker and more saturated."
-                        <br>
-                        - "I want to change the `Green` grass to look more yellow and autumnal."
-                        </p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When it is useful</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">Use it to reshape selected hue families without building a separate Qualifier selection for every adjustment. Neighboring hues can still be affected, so the result must be inspected.</p>
                     </div>
                 </div>
-
                 <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">What Do the Tools Do?</h3>
-                    <ul class="list-disc list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Color Slices (Red, Skin, etc.):** Each vertical column controls *only* its named color.</li>
-                        <li><strong>Color Wheel:** Lets you change the **Hue** of that slice. (e.g., in the `Green` slice, push the wheel towards yellow).</li>
-                        <li><strong>Center:** A slider to fine-tune the center-point of the hue you're affecting.</li>
-                        <li><strong>Vertical Sliders:** The two main vertical sliders control the **Density** (brightness) and **Saturation** (color intensity) of *only that slice*.</li>
+                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">Key controls</h3>
+                    <ul class="list-disc text-lg text-gray-300 space-y-3 pl-6">
+                        <li><strong>Vector/Color control:</strong> changes the selected color family.</li>
+                        <li><strong>Center:</strong> repositions the center of the affected hue range.</li>
+                        <li><strong>Density:</strong> changes luminance and saturation together. In Blackmagic's current Colorist Guide, raising Density produces darker, more saturated color.</li>
+                        <li><strong>Saturation:</strong> changes saturation using ColorSlice's subtractive model, with stronger influence in midtones and shadows than highlights.</li>
                     </ul>
                 </div>
-
-                <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">How Do We Use It? (Enhancing a Sky)</h3>
-                    <ol class="list-decimal list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Goal:** Make a blue sky "pop".</li>
-                        <li><strong>Step 1:** Go to the `Blue` slice.</li>
-                        <li><strong>Step 2:** Drag the right-hand vertical slider (Saturation) **up** to increase the blue's intensity.</li>
-                        <li><strong>Step 3:** Drag the left-hand vertical slider (Density) **down** to make the blue sky richer and darker.</li>
-                        <li><strong>Result:** The sky is now enhanced, while the rest of the image (skin tones, grass, etc.) is untouched.</li>
-                    </ol>
-                </div>
+                <div class="mt-8 note text-gray-300"><strong>Practice:</strong> select the Blue vector, use the highlight/range view if available, adjust Center only if the intended blues are not covered, then make small Density or Saturation changes. Check nearby cyan, skin and neutral regions for spill.</div>
             </section>
-            
-            <!-- 5. RGB Mixer -->
-            <section id="tab-rgbmixer" class="tab-content">
+
+            <section id="tab-rgbmixer" class="tab-panel" role="tabpanel" aria-labelledby="tab-rgbmixer-button" hidden>
                 <h2 class="text-3xl font-semibold text-white mb-6">5. RGB Mixer</h2>
-                <img src="Screenshot 2025-11-02 at 10.12.02.png" alt="Screenshot 2025-11-02 at 10.12.02.png" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
-                
+                <img src="photos/Screenshot 2025-11-02 at 10.12.02.png" alt="DaVinci Resolve RGB Mixer panel" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What Is It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">This is the **RGB Mixer**. It's a highly technical tool that gives you direct control over the R (Red), G (Green), and B (Blue) color channels that make up your image. It lets you "mix" how much of each original channel contributes to the final output channels.</p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What it does</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">The RGB Mixer changes how much of the source red, green and blue channels contribute to each output channel.</p>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When & Why Do We Use It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">You use this for creating highly stylized "film looks" or for solving complex color-contamination problems.
-                        <br><br>
-                        **Why?**
-                        <br>
-                        1. **Stylized Looks:** You can create "unreal" colors (e.g., making green foliage look yellow or red) to emulate certain film stocks.
-                        <br>
-                        2. **Monochrome:** It's fantastic for black & white conversion, giving you control over how bright each original color becomes in the B&W image.
-                        </p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When it is useful</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">Use it for channel remapping, controlled color casts, technical channel experiments and monochrome conversions where you want to determine how the original channels contribute to the result.</p>
                     </div>
                 </div>
-
                 <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">What Do the Tools Do?</h3>
-                    <ul class="list-disc list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Output Columns (Red, Green, Blue):** Each column controls what "goes into" that final channel.</li>
-                        <li><strong>Sliders (R, G, B):** The sliders under the **Red Output** column, for example, control "How much of the *original* Red, Green, and Blue will make up the *new* Red channel?"</li>
-                        <li><strong>Preserve Luminance:** A crucial checkbox. When ticked, Resolve tries to maintain the image's original brightness, even as you drastically shift colors. This lets you change hues without making them look darker or brighter.</li>
-                        <li><strong>Monochrome:** Ticks this to create a B&W image. The sliders now control the B&W "mix".</li>
+                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">Key controls and limits</h3>
+                    <ul class="list-disc text-lg text-gray-300 space-y-3 pl-6">
+                        <li><strong>Output columns:</strong> define the composition of the resulting red, green and blue channels.</li>
+                        <li><strong>R/G/B contribution sliders:</strong> determine how much of each source channel is mixed into the selected output channel.</li>
+                        <li><strong>Monochrome:</strong> creates a black-and-white result whose tonal contribution can be shaped by the channel mix.</li>
+                        <li><strong>Luminance/normalization options:</strong> can constrain the relationship between channel mixing and overall brightness, but the result should still be checked visually and on scopes.</li>
                     </ul>
                 </div>
-
-                <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">How Do We Use It? (Autumn Look)</h3>
-                    <ol class="list-decimal list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Goal:** Make green foliage look more yellow/orange.</li>
-                        <li><strong>Step 1:** Tick the `Preserve Luminance` box.</li>
-                        <li><strong>Step 2:** Go to the `Green Output` column.</li>
-                        <li><strong>Step 3:** Drag the `G` (Green) slider **down** (e.g., to 0.50). This removes green from the green channel.</li>
-                        <li><strong>Step 4:** Drag the `R` (Red) slider **up** (e.g., to 0.50). This adds red *into* the green channel.</li>
-                        <li><strong>Result:** The green areas of your image will shift towards yellow/orange, but their brightness will be preserved.</li>
-                    </ol>
-                </div>
+                <div class="mt-8 note text-gray-300"><strong>Practice:</strong> enable Monochrome and vary the source-channel contributions while watching how colored objects convert to gray. This makes the effect of channel mixing easier to see than memorizing arbitrary RGB values.</div>
             </section>
-            
-            <!-- 6. Color Match -->
-            <section id="tab-colormatch" class="tab-content">
+
+            <section id="tab-colormatch" class="tab-panel" role="tabpanel" aria-labelledby="tab-colormatch-button" hidden>
                 <h2 class="text-3xl font-semibold text-white mb-6">6. Color Match</h2>
-                <img src="Screenshot 2025-11-02 at 10.10.25.png" alt="Screenshot 2025-11-02 at 10.10.25.png" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
-                
+                <img src="photos/Screenshot 2025-11-02 at 10.10.25.png" alt="DaVinci Resolve Color Match panel with a color chart" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What Is It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">This is the **Color Match** panel. It's an *automatic* color correction tool that uses a physical color chart (like the "ColorChecker" shown) to instantly balance your shot.</p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What it does</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">Color Match uses a supported color chart visible in the recorded image and compares sampled patches with known chart targets to create an automatic correction.</p>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When & Why Do We Use It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">You use this at the **very beginning** of your grade, on footage where you filmed a color chart on set.
-                        <br><br>
-                        **Why?**
-                        <br>
-                        1. **For a Neutral Start:** It gives you a 100% technically accurate, neutral image in one click.
-                        <br>
-                        2. **To Match Different Cameras:** This is its best use. If you have a shot from a Sony and a shot from a Canon, they'll look different. If you film the chart with both and "Color Match" both clips, they will be perfectly matched to the same standard, making them easy to grade together.
-                        </p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When it is useful</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">Use it when a properly exposed and aligned supported chart was recorded under the scene lighting. It can provide a useful calibration or starting point before manual balancing and shot matching.</p>
                     </div>
                 </div>
-
                 <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">What Do the Tools Do?</h3>
-                    <ul class="list-disc list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Chart Selector:** A dropdown (top right) where you tell Resolve *which* chart you used (e.g., "Calibrite ColorChecker Classic").</li>
-                        <li><strong>Source Gamma, Target Gamma, Target Color Space:** You tell Resolve the source (often "Auto") and the target you want to convert to (usually "Rec.709").</li>
-                        <li><strong>Match Button:** The button you press to make the magic happen.</li>
-                    </ul>
-                </div>
-
-                <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">How Do We Use It? (A Basic Match)</h3>
-                    <ol class="list-decimal list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Step 1:** In your viewer, change the dropdown from "Qualifier" (eyedropper) to "Color Chart".</li>
-                        <li><strong>Step 2:** A grid will appear. Drag this grid over the color chart in your video footage and align the squares.</li>
-                        <li><strong>Step 3:** In the `Color Match` panel, select the chart you used (e.g., "ColorChecker Classic").</li>
-                        <li><strong>Step 4:** Set your `Target Gamma` and `Target Color Space` (usually Rec.709 for both).</li>
-                        <li><strong>Step 5:** Click `Match`. Resolve will instantly analyze the colors and apply a correction.</li>
+                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">Correct setup</h3>
+                    <ol class="list-decimal text-lg text-gray-300 space-y-3 pl-6">
+                        <li>Choose the chart type that actually appears in the footage.</li>
+                        <li>Align the on-screen chart grid carefully with the recorded patches.</li>
+                        <li>Set Source Gamma, Target Gamma and Target Color Space to match the project's real color-management path. These values are not universally Rec.709.</li>
+                        <li>Click <strong>Match</strong>, then inspect the result on scopes and against the other shots.</li>
                     </ol>
                 </div>
+                <div class="mt-8 note text-gray-300"><strong>Limit:</strong> Color Match does not guarantee a 100% neutral image or perfect camera-to-camera matching. Chart exposure, lighting, reflections, alignment, camera response and color-management settings all affect the result.</div>
             </section>
-            
-            <!-- 7. Camera Raw -->
-            <section id="tab-cameraraw" class="tab-content">
+
+            <section id="tab-cameraraw" class="tab-panel" role="tabpanel" aria-labelledby="tab-cameraraw-button" hidden>
                 <h2 class="text-3xl font-semibold text-white mb-6">7. Camera Raw</h2>
-                <img src="Screenshot 2025-11-02 at 10.10.20.png" alt="Screenshot 2025-11-02 at 10.10.20.png" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
-                
+                <img src="photos/Screenshot 2025-11-02 at 10.10.20.png" alt="DaVinci Resolve Camera Raw panel" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What Is It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">This is the **Camera Raw** panel. This panel *only* works if your source footage is a **RAW video format** (like Blackmagic RAW, REDCODE, ARRI RAW, etc.). It allows you to "develop" the raw sensor data *before* it even enters the color grading pipeline.</p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What it does</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">The Camera Raw palette exposes decoder controls for supported RAW media. Available parameters depend on the RAW format, camera metadata and project color-management configuration.</p>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When & Why Do We Use It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">This is the **absolute first step** in your workflow, done before you even add a color grading node.
-                        <br><br>
-                        **Why?** To get the best possible image quality from your file. Changing "Exposure" here is *not* the same as using the `Gain` wheel; it's like changing the ISO or exposure *in the camera*. You can recover huge amounts of "lost" detail from highlights and shadows that would be impossible to fix on a normal video file.
-                        </p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When it is useful</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">Use it when a RAW clip needs source-specific decode adjustments such as ISO, exposure or white-balance interpretation before normal node-based grading.</p>
                     </div>
                 </div>
-
                 <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">What Do the Tools Do?</h3>
-                    <ul class="list-disc list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Decode Quality:** Lets you work at a lower resolution (e.g., "Half res.") to get better playback performance while editing. You can set it back to "Full res." for the final export.</li>
-                        <li><strong>Decode Using:** The most important setting. Change this from "Camera metadata" to **"Clip"**.</li>
-                        <li><strong>"Clip" Controls:** Once "Decode Using" is set to "Clip", this panel unlocks controls for **ISO**, **Exposure**, **Color Temp**, **Tint**, **Highlight Recovery**, and more, specific to that camera's RAW format.</li>
+                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">Important distinctions</h3>
+                    <ul class="list-disc text-lg text-gray-300 space-y-3 pl-6">
+                        <li><strong>Decode Using:</strong> Camera/Project/Clip choices determine whether metadata, project defaults or per-clip overrides are used. <strong>Clip</strong> is useful when you need a per-clip override; it is not a universal requirement.</li>
+                        <li><strong>RAW controls:</strong> ISO, Exposure, Color Temperature, Tint, Highlight Recovery and other controls vary by codec and camera.</li>
+                        <li><strong>Color management:</strong> some Raw palette color-space and gamma controls can be disabled or interpreted differently in color-managed projects.</li>
                     </ul>
                 </div>
-
-                <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">How Do We Use It? (Recovering a Shot)</h3>
-                    <ol class="list-decimal list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Step 1:** Select your RAW clip.</li>
-                        <li><strong>Step 2:** Go to the `Camera Raw` panel.</li>
-                        <li><strong>Step 3:** Change `Decode Using` to **"Clip"**.</li>
-                        <li><strong>Step 4:** Adjust the `Exposure`, `ISO`, and `Color Temp` sliders to get a good, neutral-looking base image. If your highlights are blown out, try ticking the "Highlight Recovery" box (if available).</li>
-                        <li><strong>Step 5:** Now, go to your nodes and begin your *creative* grade using the Primaries wheels.</li>
-                    </ol>
-                </div>
+                <div class="mt-8 note text-gray-300"><strong>Limit:</strong> changing RAW decoder metadata after recording is not the same as changing the physical exposure at capture time. RAW processing can use recorded sensor data more flexibly than many encoded formats, but it cannot recover information that was never recorded or that is genuinely clipped.</div>
             </section>
-            
-            <!-- 8. Motion Effects -->
-            <section id="tab-motion" class="tab-content">
+
+            <section id="tab-motion" class="tab-panel" role="tabpanel" aria-labelledby="tab-motion-button" hidden>
                 <h2 class="text-3xl font-semibold text-white mb-6">8. Motion Effects</h2>
-                <img src="Screenshot 2025-11-02 at 10.12.09.png" alt="Screenshot 2025-11-02 at 10.12.09.png" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
-                
+                <img src="photos/Screenshot 2025-11-02 at 10.12.09.png" alt="DaVinci Resolve Motion Effects panel" class="w-full rounded-lg shadow-xl mb-8 border border-gray-700">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What Is It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">This is the **Motion Effects** panel. This tool doesn't affect color. Instead, it deals with **Noise Reduction (NR)** (removing grain) and adding **Motion Blur**.</p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">What it does</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">The Motion Effects palette contains temporal and spatial noise-reduction controls plus motion-blur controls. Temporal NR compares information across frames; Spatial NR works within a frame.</p>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">When & Why Do We Use It?</h3>
-                        <p class="text-lg text-gray-300 leading-relaxed">You use this to clean up footage or fix motion issues.
-                        <br><br>
-                        **Why?**
-                        <br>
-                        1. **Noise Reduction:** To clean up "noisy" or "grainy" footage that was shot in low light. Resolve's noise reduction is one of the best available.
-                        <br>
-                        2. **Add Motion Blur:** To fix "stuttery" footage shot at a high shutter speed, or to make visual effects and titles look like they "belong" in the scene.
-                        <br><br>
-                        <strong>Warning:</strong> Noise Reduction is *extremely* intensive on your computer's GPU and will slow down playback.
-                        </p>
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-3">Availability</h3>
+                        <p class="text-lg text-gray-300 leading-relaxed">Blackmagic documents temporal noise reduction, spatial noise reduction and Motion Effects as DaVinci Resolve Studio features. Students using the free edition may not have these controls.</p>
                     </div>
                 </div>
-
                 <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">What Do the Tools Do?</h3>
-                    <ul class="list-disc list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Temporal NR:** The most powerful NR. It reduces noise by comparing pixels *across multiple frames* (over time). It's great at removing "dancing" noise.</li>
-                        <li><strong>Spatial NR:** Reduces noise by comparing pixels *within the same frame*. It's more like a smart blur.</li>
-                        <li><strong>Motion Blur:** *Adds* artificial motion blur to your clip.</li>
-                    </ul>
-                </div>
-
-                <div class="mt-8">
-                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">How Do We Use It? (Basic Noise Reduction)</h3>
-                    <ol class="list-decimal list-inside text-lg text-gray-300 space-y-3 pl-2">
-                        <li><strong>Step 1:** Add a new node (often the very last node in your tree).</li>
-                        <li><strong>Step 2:** Go to the `Temporal NR` section.</li>
-                        <li><strong>Step 3:** Set `Frames` to 1 or 2.</li>
-                        <li><strong>Step 4:** In the `Temporal Threshold` box, *gently* increase the `Luma` (brightness noise) and `Chroma` (color noise) sliders.</li>
-                        <li><strong>Step 5:** Play the clip and watch for artifacts. Use the *lowest* possible value that cleans up the noise, as high values can create "ghosting" or make the image look waxy.</li>
+                    <h3 class="text-2xl font-semibold text-blue-400 mb-4">Working method</h3>
+                    <ol class="list-decimal text-lg text-gray-300 space-y-3 pl-6">
+                        <li>Evaluate whether the shot actually needs noise reduction before enabling it.</li>
+                        <li>Blackmagic's current Color-page guidance recommends starting with temporal reduction and adding spatial reduction gradually if needed.</li>
+                        <li>Use conservative thresholds and review moving detail as well as still frames.</li>
+                        <li>Watch for ghosting, smearing, texture loss and excessive render/playback cost.</li>
                     </ol>
                 </div>
+                <div class="mt-8 note text-gray-300"><strong>Workflow note:</strong> node placement depends on the grade and pipeline. Do not memorize “always first” or “always last” placement as a universal rule.</div>
             </section>
-
         </main>
+
+        <footer class="mt-12 pt-8 border-t border-gray-700 text-sm text-gray-400 space-y-2">
+            <p><strong>Primary references:</strong> Blackmagic Design's current DaVinci Resolve Color documentation and <em>The Colorist Guide to DaVinci Resolve 20</em>.</p>
+            <p><a class="text-blue-400 underline" href="https://www.blackmagicdesign.com/products/davinciresolve/color">Blackmagic Design — Color page</a> · <a class="text-blue-400 underline" href="https://www.blackmagicdesign.com/products/davinciresolve/training">Official Resolve training</a></p>
+            <p>Independent educational reference; not official Blackmagic Design documentation.</p>
+        </footer>
     </div>
 
-    <!-- JavaScript for Tab Functionality -->
     <script>
-        // Wait for the document to be fully loaded
         document.addEventListener('DOMContentLoaded', () => {
-            const tabNav = document.getElementById('tab-nav');
-            const contentArea = document.getElementById('tab-content-area');
-            const tabs = tabNav.querySelectorAll('.tab-button');
-            const contents = contentArea.querySelectorAll('.tab-content');
+            const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+            const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
 
-            // Add click event listener to the navigation container
-            tabNav.addEventListener('click', (event) => {
-                // Find the clicked tab button
-                const clickedTab = event.target.closest('.tab-button');
-                
-                // If it's not a tab button, do nothing
-                if (!clickedTab) return;
-
-                // Get the target tab content ID from the data-tab attribute
-                const targetId = clickedTab.dataset.tab;
-                const targetContent = document.getElementById(targetId);
-
-                // If the target content doesn't exist, do nothing
-                if (!targetContent) return;
-
-                // Remove 'active' class from all tab buttons
-                tabs.forEach(tab => {
-                    tab.classList.remove('active');
+            function activateTab(tab, moveFocus = false) {
+                const panelId = tab.getAttribute('aria-controls');
+                tabs.forEach(item => {
+                    const selected = item === tab;
+                    item.setAttribute('aria-selected', selected ? 'true' : 'false');
+                    item.tabIndex = selected ? 0 : -1;
                 });
-
-                // Add 'active' class to the clicked tab button
-                clickedTab.classList.add('active');
-
-                // Hide all tab content
-                contents.forEach(content => {
-                    content.classList.remove('active');
+                panels.forEach(panel => {
+                    panel.hidden = panel.id !== panelId;
                 });
+                if (moveFocus) tab.focus();
+            }
 
-                // Show the target tab content
-                targetContent.classList.add('active');
+            tabs.forEach((tab, index) => {
+                tab.addEventListener('click', () => activateTab(tab));
+                tab.addEventListener('keydown', event => {
+                    let nextIndex = null;
+                    if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+                    if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+                    if (event.key === 'Home') nextIndex = 0;
+                    if (event.key === 'End') nextIndex = tabs.length - 1;
+                    if (nextIndex !== null) {
+                        event.preventDefault();
+                        activateTab(tabs[nextIndex], true);
+                    }
+                });
             });
         });
     </script>
-
 </body>
 </html>
-
